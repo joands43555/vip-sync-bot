@@ -8,10 +8,28 @@ from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ContextTypes
 
 # ── CONFIGURACIÓN ──────────────────────────────────────────
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "8653316159:AAGYWnTKRmIwto-f_3HxLKeO55Re8Kr56uk")
-SOURCE_CHANNEL_ID = int(os.environ.get("SOURCE_CHANNEL_ID", "-1003802009980"))   # VIP (origen)
-DEST_CHANNEL_ID = int(os.environ.get("DEST_CHANNEL_ID", "-1003651033630"))       # VIP Acces (destino)
-RENDER_URL = os.environ.get("RENDER_URL", "https://vip-sync-bot.onrender.com")  # actualizar tras el primer deploy
+# Todo se lee SOLO de variables de entorno. Nada de secretos en el código.
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+SOURCE_CHANNEL_ID = os.environ.get("SOURCE_CHANNEL_ID")   # VIP (origen)
+DEST_CHANNEL_ID = os.environ.get("DEST_CHANNEL_ID")       # VIP Acces (destino)
+RENDER_URL = os.environ.get("RENDER_URL")                 # URL pública actual del servicio en Render
+
+_faltantes = [
+    nombre for nombre, valor in [
+        ("BOT_TOKEN", BOT_TOKEN),
+        ("SOURCE_CHANNEL_ID", SOURCE_CHANNEL_ID),
+        ("DEST_CHANNEL_ID", DEST_CHANNEL_ID),
+        ("RENDER_URL", RENDER_URL),
+    ] if not valor
+]
+if _faltantes:
+    raise SystemExit(
+        f"❌ Faltan variables de entorno en Render: {', '.join(_faltantes)}. "
+        "Configuralas en Render → Environment antes de desplegar."
+    )
+
+SOURCE_CHANNEL_ID = int(SOURCE_CHANNEL_ID)
+DEST_CHANNEL_ID = int(DEST_CHANNEL_ID)
 
 logging.basicConfig(format="%(asctime)s | %(levelname)s | %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
